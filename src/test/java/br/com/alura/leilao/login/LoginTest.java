@@ -4,111 +4,58 @@ import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 
-public class LoginTest {
+import br.com.alura.leilao.cenarios.ICenariosTest;
 
-	/*
-	 * @Test public void deveriaEfetuarLoginDadosValidos() {
-	 * System.setProperty("webdriver.gecko.driver",
-	 * "../2019-selenium-java-projeto_inicial/drivers-selenium/geckodriver");
-	 * WebDriver browser = new FirefoxDriver();
-	 * browser.navigate().to("http://localhost:8080/login");
-	 * browser.findElement(By.id("username")).sendKeys("fulano");
-	 * browser.findElement(By.id("password")).sendKeys("pass");
-	 * browser.findElement(By.id("login-form")).submit();
-	 * 
-	 * Assert.assertFalse(browser.getCurrentUrl().equals(
-	 * "http://localhost:8080/leiloes")); //Assert.assertEquals("fulano",
-	 * browser.findElement(By.id("logado")).getText()); // ERROR
-	 * 
-	 * browser.quit();
-	 * 
-	 * }
-	 */
+public class LoginTest implements ICenariosTest {
 
-	private static final String URL_LOGIN = "http://localhost:8080/login";
-	private WebDriver browser;
-
-	/**
-	 * antes de TODAS execucoes abrir o browser pagina de Login
-	 */
-	private void beforeAll() {
-        
-	}
+	private LoginPage loginPagePO;
 
 	/**
 	 * antes de CADA execucao
 	 */
 	@BeforeEach
-	private void beforeEach() {
-		System.setProperty("webdriver.chrome.driver",
-				"../2019-selenium-java-projeto_inicial/drivers-selenium/chromedriver");
-		this.browser = new ChromeDriver();
+	@Override
+	public void beforeEach() {
+		this.loginPagePO = new LoginPage();
 	}
 
 	/**
 	 * FINAL de cada execucao fechar o browser
 	 */
 	@AfterEach
-	private void afterEach() {
-		browser.quit();
+	@Override
+	public void afterEach() {
+		loginPagePO.finalizarTeste();
 	}
 
-	// @Test
+	@Test
 	public void deveriaEfetuarLoginDadosValidos() {
-		browser.navigate().to(URL_LOGIN);
-		browser.findElement(By.id("username")).sendKeys("fulano");
-		browser.findElement(By.id("password")).sendKeys("pass");
-		browser.findElement(By.id("login-form")).submit();
+		loginPagePO.paginaLogin();
+		loginPagePO.preencherUsuarioSenhaLogin("fulano", "pass");
+		loginPagePO.submeterFormulario();
 
-		Assert.assertFalse(browser.getCurrentUrl().equals(URL_LOGIN));
-		Assert.assertEquals("fulano", browser.findElement(By.id("logado")).getText()); // ERROR
-
+		Assert.assertFalse(loginPagePO.isPaginaDeLogin());
+		Assert.assertEquals("fulano", loginPagePO.usuarioLogado());
 	}
 
 	@Test
 	public void naoDeveriaEfetuarLoginDadosInvalidos() {
-		System.setProperty("webdriver.chrome.driver",
-				"../2019-selenium-java-projeto_inicial/drivers-selenium/chromedriver");
-		WebDriver browser = new ChromeDriver();
-		browser.navigate().to(URL_LOGIN);
-		browser.findElement(By.id("username")).sendKeys("qualquercoisa");
-		browser.findElement(By.id("password")).sendKeys("123456");
-		browser.findElement(By.id("login-form")).submit();
+		loginPagePO.paginaLogin();
+		loginPagePO.preencherUsuarioSenhaLogin("qualquecoisa", "123456");
+		loginPagePO.submeterFormulario();
 
-		Assert.assertTrue(browser.getCurrentUrl().equals("http://localhost:8080/login?error"));
-		Assert.assertTrue(browser.getPageSource().contains("Usuário e senha inválidos."));
-		Assert.assertThrows(NoSuchElementException.class, () -> browser.findElement(By.id("logado")));
-
-		browser.quit();
-
+		Assert.assertTrue(loginPagePO.isPaginaDeLoginError());
+		Assert.assertNull("fulano", loginPagePO.usuarioLogado());
+		Assert.assertTrue(loginPagePO.contemTexto("Usuário e senha inválidos."));
 	}
 
-	/*
-	 * @Test public void naoDeveriaEfetuarLoginDadosInvalidos() {
-	 * System.setProperty("webdriver.chrome.driver",
-	 * "../2019-selenium-java-projeto_inicial/drivers-selenium/chromedriver");
-	 * WebDriver browser = new ChromeDriver();
-	 * browser.navigate().to("http://127.0.0.1:8080/login");
-	 * browser.findElement(By.id("username")).sendKeys("qualquercoisa");
-	 * browser.findElement(By.id("password")).sendKeys("123456");
-	 * browser.findElement(By.id("login-form")).submit();
-	 * 
-	 * Assert.assertTrue(browser.getCurrentUrl().contains(
-	 * "http://127.0.0.1:8080/login?error"));
-	 * Assert.assertTrue(browser.getPageSource().
-	 * contains("Usuário e senha inválidos."));
-	 * //Assert.assertNotSame("fulano",browser.findElement(By.id("username")).
-	 * getText());
-	 * 
-	 * 
-	 * //browser.quit();
-	 * 
-	 * }
-	 */
+	@Test
+	public void paginaRestritaNaoLogado() {
+		loginPagePO.paginaLeilao();
 
+		Assert.assertTrue(loginPagePO.isPaginaDeLogin());
+		Assert.assertFalse(loginPagePO.contemTexto("Dados do Leilão"));
+
+	}
 }
