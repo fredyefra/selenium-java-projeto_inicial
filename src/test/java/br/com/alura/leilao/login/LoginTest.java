@@ -9,7 +9,7 @@ import br.com.alura.leilao.cenarios.ICenariosTest;
 
 public class LoginTest implements ICenariosTest {
 
-	private LoginPage loginPagePO;
+	private LoginPageObject loginPagePO;
 
 	/**
 	 * antes de CADA execucao
@@ -17,7 +17,7 @@ public class LoginTest implements ICenariosTest {
 	@BeforeEach
 	@Override
 	public void beforeEach() {
-		this.loginPagePO = new LoginPage();
+		this.loginPagePO = new LoginPageObject();
 	}
 
 	/**

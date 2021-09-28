@@ -1,4 +1,4 @@
-package br.com.alura.leilao.login;
+package br.com.alura.leilao.lance;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -11,19 +11,22 @@ import org.openqa.selenium.chrome.ChromeDriver;
  * aplicado para abstrair as páginas de uma aplicação com o objetivo de reduzir
  * o acoplamento entre os casos de teste e a aplicação a ser testada.
  */
-public class LoginPage {
+public class NovoLeilaoPageObject {
 
+	private static final String LEILAO_LOGIN = "http://localhost:8080/leiloes";
 	private static final String URL_LOGIN = "http://localhost:8080/login";
 	private WebDriver browser;
 
-	public LoginPage() {
+	public NovoLeilaoPageObject() {
 		System.setProperty("webdriver.chrome.driver",
 				"../2019-selenium-java-projeto_inicial/drivers-selenium/chromedriver");
 		this.browser = new ChromeDriver();
-		// this.browser.navigate().to(URL_LOGIN);
+		this.browser.manage().window().maximize();
+		// this.browser.manage().timeouts().pageLoadTimeout(1, TimeUnit.MINUTES);
+
 	}
 
-	public LoginPage(WebDriver browser) {
+	public NovoLeilaoPageObject(WebDriver browser) {
 		super();
 		this.browser = browser;
 	}
@@ -32,34 +35,22 @@ public class LoginPage {
 		this.browser.navigate().to(URL_LOGIN);
 	}
 
-	public void paginaLeilao() {
-		this.browser.navigate().to("http://localhost:8080/leiloes/2");
-	}
-	
 	public void preencherUsuarioSenhaLogin(String usuario, String senha) {
 		browser.findElement(By.id("username")).sendKeys(usuario);
 		browser.findElement(By.id("password")).sendKeys(senha);
 	}
 
+	public void finalizarTeste() {
+		browser.quit();
+	}
+
 	public void submeterFormulario() {
 		browser.findElement(By.id("login-form")).submit();
-	}
+    }
 
 	public boolean isPaginaDeLogin() {
+		// return browser.getPageSource().equals(URL_LOGIN);
 		return browser.getCurrentUrl().equals(URL_LOGIN);
-	}
-
-	public boolean isPaginaDeLoginError() {
-		return browser.getCurrentUrl().equals("http://localhost:8080/login?error");
-	}
-
-	public boolean contemTexto(String texto) {
-		return browser.getPageSource().contains(texto);
-	}
-
-	public boolean isPaginaLeilao() {
-		return browser.getCurrentUrl().equals("http://localhost:8080/leiloes/2");
-		// return browser.getCurrentUrl().equals(URL_LOGIN);
 	}
 
 	public String usuarioLogado() {
@@ -72,8 +63,13 @@ public class LoginPage {
 		}
 	}
 
-	public void finalizarTeste() {
-		browser.quit();
+	public void clicarNovoLeila() {
+		browser.findElement(By.id("novo_leilao_link")).click();
+
 	}
 
+	public void preencherFormularioNovoLeilao(String nome) {
+		browser.findElement(By.id("nome")).sendKeys(nome);
+
+	}
 }
